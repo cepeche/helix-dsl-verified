@@ -276,7 +276,7 @@ actualizarTotalHoy()
 - ✅ Portable entre sistemas
 
 ### ¿Por qué PHP vanilla?
-- ✅ Disponible en NAS Synology
+- ✅ Disponible en WD My Cloud EX2 Ultra (PHP-FPM nativo)
 - ✅ Sin dependencias externas
 - ✅ Fácil de mantener
 - ✅ Bajo consumo de recursos
@@ -337,7 +337,7 @@ cd backend && php -S localhost:8000
 cd frontend && php -S localhost:8080
 ```
 
-### NAS Synology
+### NAS (WD My Cloud EX2 Ultra)
 ```bash
 ./scripts/deploy-nas.sh
 ```

@@ -77,12 +77,11 @@ const API_CONFIG = {
 };
 ```
 
-## 🏠 Instalación en NAS (Synology)
+## 🏠 Instalación en NAS (WD My Cloud EX2 Ultra)
 
 ### Requisitos
-- Synology NAS con DSM 7.x
-- Paquete "Web Station" instalado
-- PHP 7.4+ habilitado
+- WD My Cloud EX2 Ultra (Linux Debian-based, Apache nativo)
+- PHP-FPM habilitado (PHP 7.4+)
 - Acceso SSH activado
 
 ### Pasos de instalación

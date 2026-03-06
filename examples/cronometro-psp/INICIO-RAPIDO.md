@@ -84,12 +84,11 @@ http://192.168.1.100:8080
 
 ---
 
-## Para desplegar en tu NAS Synology
+## Para desplegar en tu NAS (WD My Cloud EX2 Ultra)
 
 ### Pre-requisitos
-- NAS con DSM 7.x
-- Web Station instalado
-- PHP 7.4+ habilitado
+- WD My Cloud EX2 Ultra con Apache nativo
+- PHP-FPM habilitado (PHP 7.4+)
 - SSH activado
 
 ### Pasos
