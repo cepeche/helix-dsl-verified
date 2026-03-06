@@ -9,7 +9,7 @@
 Durante el desarrollo de helix-dsl-verified ocurrió algo que no estaba
 planificado y que merece documentarse como hallazgo en sí mismo.
 
-El humano compartió los documentos del proyecto con Gemini 2.0 Pro en una
+El humano compartió los documentos del proyecto con Gemini 3.1 Pro en una
 sesión separada. Gemini no tenía acceso a un entorno Linux para clonar el
 repositorio, pero leyó los `.md` directamente. Hizo contribuciones genuinas
 al diseño (ver `memo-gemini-20260304.md`), y por iniciativa propia pidió al

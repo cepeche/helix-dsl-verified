@@ -2,7 +2,7 @@
 
 **Estado**: propuesta de diseño — en revisión (actualizado con Seguridad por Diseño)
 **Fecha**: 4–6 de marzo de 2026
-**Participantes**: desarrollador + Claude Sonnet 4.6 + Claude Opus 4.6 + Gemini 2.0 Pro
+**Participantes**: desarrollador + Claude Sonnet 4.6 + Claude Opus 4.6 + Gemini 3.1 Pro
 **Referencias de diseño**: Parnas & Clements (A Rational Design Process: How and Why to Fake It, 1986); Reenskaug (DCI)
 
 ---
