@@ -1,0 +1,47 @@
+-- contexts/ModoNormal.helix
+-- El modo base: el usuario consulta y activa sesiones.
+-- No hay edición de tareas ni actividades.
+
+context ModoNormal:
+
+    role tarjeta_tipo: TipoTarea
+        on tap -> seleccionarTipoTarea(self.tipoId)
+
+    role tarjeta_tarea: Tarea
+        on tap -> iniciarTarea(self.tareaId)
+
+    role pestana_actividad: Actividad
+        on tap -> cambiarPestana(self.id)
+
+    role pestana_frecuentes: Pestaña
+        on tap -> cambiarPestana('frecuentes')
+
+    role boton_edicion: Boton
+        on tap -> activarEdicion
+
+    role boton_nuevo: Boton
+        on tap -> abrirCrearTarea
+
+    role boton_configuracion: Boton
+        on tap -> abrirMenuConfiguracion
+
+    transitions:
+        on activarEdicion        -> ModoEdicion
+        on abrirCrearTarea       -> ModalCrearTarea
+        on abrirMenuConfiguracion -> MenuConfiguracion
+
+        -- seleccionarTipoTarea puede ramificar:
+        --   si el tipo tiene exactamente 1 actividad → ModalComentario
+        --   si tiene >1 actividades              → ModalSeleccionActividad
+        --
+        -- PROPUESTA GAP-5: transiciones condicionales.
+        -- La condición depende de datos (self.actividades_permitidas.length).
+        -- El DSL actual no tiene sintaxis para esto.
+        -- Sintaxis propuesta:
+        --   on seleccionarTipoTarea si actividades_unicas  -> ModalComentario
+        --   on seleccionarTipoTarea si multiples_actividades -> ModalSeleccionActividad
+        on seleccionarTipoTarea  -> ModalComentario         -- caso simplificado
+
+    effects:
+        cambiarPestana  -> actualizarGridVisible()
+        iniciarTarea    -> external iniciar_sesion(tarea_id, notas, minutos_retroactivos, sustituir)

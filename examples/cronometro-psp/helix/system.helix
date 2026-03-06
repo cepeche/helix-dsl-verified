@@ -1,0 +1,54 @@
+-- system.helix — Declaración del sistema CronometroPSP
+-- Fecha: 6 de marzo de 2026
+
+-- ─────────────────────────────────────────────────────────────────
+-- NOTA DE DISEÑO: Este archivo revela tres tipos de contexto
+-- que el DSL actual no distingue sintácticamente:
+--
+--   (1) Contextos BASE: mutuamente excluyentes. En cada momento
+--       exactamente uno está activo. Son el "modo" del sistema.
+--
+--   (2) Contextos CONCURRENTES: coexisten con el contexto base.
+--       Añaden comportamiento sin reemplazarlo.
+--       Ejemplo: SesionActiva añade el timer y la lógica de
+--       sustitución, sin importar si estamos en ModoNormal o
+--       ModoEdicion.
+--
+--   (3) Contextos OVERLAY (modal): se apilan sobre el contexto
+--       base. Bloquean la interacción con él. Cuando terminan,
+--       el sistema vuelve al contexto base que había debajo.
+--       Ejemplo: ModalComentario se abre desde ModoNormal, pero
+--       ModoNormal sigue "ahí" esperando.
+--
+-- El diseño actual solo prevé la composición con prioridad entre
+-- contextos iguales. PROPUESTA: los tres tipos necesitan
+-- sintaxis explícita (ver ANALISIS_GAPS.md).
+-- ─────────────────────────────────────────────────────────────────
+
+system CronometroPSP:
+    initial: ModoNormal
+
+    -- (1) Contextos base — mutuamente excluyentes
+    contexts:
+        ModoEdicion
+        ModoNormal          -- base por defecto
+    composition: exclusiva
+
+    -- (2) Contextos concurrentes — coexisten con el base
+    -- PROPUESTA: nueva cláusula 'concurrent'
+    concurrent:
+        SesionActiva        -- activo cuando hay sesión en curso
+
+    -- (3) Contextos overlay — se apilan, preservan el base
+    -- PROPUESTA: nueva cláusula 'overlays'
+    overlays:
+        MenuConfiguracion
+        ModalComentario
+        ModalSeleccionActividad
+        ModalCrearTarea
+        ModalEditarTarea
+        ModalEditarActividad
+        ModalCrearActividad
+        ModalHistorial
+        ModalReset
+        ModalAcercaDe

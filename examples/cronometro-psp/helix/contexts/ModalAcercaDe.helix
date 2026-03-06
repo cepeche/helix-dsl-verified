@@ -1,0 +1,18 @@
+-- contexts/ModalAcercaDe.helix
+-- Overlay: información sobre la aplicación y estado de conexión.
+-- Es el contexto más simple: solo lectura, un botón de cierre.
+--
+-- Interesante: al ENTRAR en este contexto se lanzan dos llamadas API
+-- (healthCheck y getAcumulado). Esto refuerza GAP-7 (lifecycle effects).
+
+context ModalAcercaDe:
+
+    role boton_cerrar: Boton
+        on tap -> cerrar
+
+    transitions:
+        on cerrar -> [cerrar_overlay]
+
+    effects:
+        [al_entrar] -> external verificar_conexion()      -- GAP-7: lifecycle
+        [al_entrar] -> external cargar_tiempo_acumulado() -- GAP-7: múltiples efectos al entrar

@@ -1,0 +1,54 @@
+-- contexts/ModalComentario.helix
+-- Overlay: se muestra antes de iniciar una sesión.
+-- El usuario puede añadir comentario, indicar minutos retroactivos,
+-- y (si hay SesionActiva) optar por sustituir la sesión en curso.
+--
+-- PROPUESTA GAP-1: este contexto necesita recibir el tipoTareaId
+-- (y opcionalmente tareaId) del contexto que lo abre.
+-- En app.js esto se resuelve con AppState.tareaIdPendiente —
+-- exactamente el estado implícito que helix quiere eliminar.
+--
+-- Sintaxis propuesta para parámetros de entrada:
+--   context ModalComentario:
+--       input: tipoTareaId: Id, tareaId: Id?
+
+context ModalComentario:
+
+    -- PROPUESTA GAP-1: declarar parámetros de entrada del overlay
+    -- input:
+    --     tipoTareaId: Id
+    --     tareaId: Id?      -- opcional: si ya se eligió actividad
+
+    role campo_comentario: CampoTexto
+        on cambio -> actualizarComentario(self.valor)
+
+    role campo_retroactivo: CampoNumerico
+        on cambio -> actualizarRetroactivo(self.valor)
+
+    -- Este botón siempre existe
+    role boton_confirmar: Boton
+        on tap -> confirmarInicio
+
+    role boton_cancelar: Boton
+        on tap -> cancelar
+
+    -- PROPUESTA GAP-4: el checkbox_sustituir solo existe
+    -- cuando SesionActiva está activo concurrentemente.
+    -- Referencia cruzada con SesionActiva.helix.
+    -- Por ahora lo omitimos aquí y lo definimos en SesionActiva.helix.
+
+    -- PROPUESTA GAP-5: transición condicional basada en validación.
+    -- confirmarInicio solo debe proceder si el estado del modal es válido
+    -- (en este caso siempre es válido; no hay campo obligatorio vacío).
+    -- Pero en ModalCrearTarea y ModalEditarTarea SÍ hay validación.
+
+    transitions:
+        on confirmarInicio -> [cerrar_overlay]   -- PROPUESTA GAP-2: cerrar overlay
+                                                  -- y volver al contexto base
+        on cancelar        -> [cerrar_overlay]
+
+    effects:
+        confirmarInicio -> external iniciar_sesion(tipoTareaId, comentario, retroactivo, sustituir)
+        -- Nota: 'sustituir' viene del checkbox_sustituir de SesionActiva,
+        -- que puede no estar presente si no hay sesión activa.
+        -- Default: sustituir = false

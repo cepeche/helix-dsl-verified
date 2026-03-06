@@ -1,0 +1,89 @@
+-- contexts/ModalReset.helix
+-- Overlay: puesta a cero de datos. Proceso de 3 fases lineales.
+-- Este es el ejemplo más complejo de sub-contextos:
+-- las fases son estrictamente secuenciales y el usuario puede
+-- retroceder (pero no saltarse fases).
+
+context ModalReset:
+
+    role boton_cancelar: Boton
+        on tap -> cerrar
+
+    transitions:
+        on cerrar -> [cerrar_overlay]
+
+    -- ─────────────────────────────────────────────────────────────
+    -- Fase 1: aviso sobre lo que va a ocurrir
+    -- ─────────────────────────────────────────────────────────────
+    context ResetFase1:
+
+        role boton_continuar: Boton
+            on tap -> avanzarAFase2
+
+        role boton_cancelar: Boton
+            on tap -> cerrar
+
+        role boton_exportar_csv: Boton
+            on tap -> exportarCSV              -- descarga previa opcional
+
+        transitions:
+            on avanzarAFase2 -> ResetFase2
+            on cerrar        -> ModalReset
+
+        effects:
+            exportarCSV -> external descargar_csv()
+
+    -- ─────────────────────────────────────────────────────────────
+    -- Fase 2: elegir actividades a conservar
+    -- ─────────────────────────────────────────────────────────────
+    context ResetFase2:
+
+        -- PROPUESTA GAP-6: rol dinámico (uno por actividad existente)
+        -- role checkbox_actividad[]: OpcionActividad
+        --     on cambio -> toggleConservar(self.id, self.marcado)
+        role checkbox_actividad: OpcionActividad
+            on cambio -> toggleConservar(self.id, self.marcado)
+
+        role boton_continuar: Boton
+            on tap -> avanzarAFase3
+
+        role boton_atras: Boton
+            on tap -> retrocederAFase1
+
+        transitions:
+            on avanzarAFase3   -> ResetFase3
+            on retrocederAFase1 -> ResetFase1
+
+    -- ─────────────────────────────────────────────────────────────
+    -- Fase 3: confirmación escribiendo "BORRAR"
+    -- ─────────────────────────────────────────────────────────────
+    context ResetFase3:
+
+        role campo_confirmacion: CampoTexto
+            on cambio -> actualizarConfirmacion(self.valor)
+
+        role boton_ejecutar: Boton
+            on tap -> ejecutarReset
+
+        role boton_atras: Boton
+            on tap -> retrocederAFase2
+
+        -- PROPUESTA GAP-5: ejecutarReset condicional.
+        -- Solo procede si campo_confirmacion.valor == "BORRAR".
+        -- Sintaxis propuesta:
+        --   on ejecutarReset si campo_confirmacion.valor == "BORRAR" -> [cerrar_overlay]
+        --   on ejecutarReset si campo_confirmacion.valor != "BORRAR" -> mostrarErrorConfirmacion
+
+        transitions:
+            on ejecutarReset   -> [cerrar_overlay]
+            on retrocederAFase2 -> ResetFase2
+
+        effects:
+            ejecutarReset -> external reset_datos(actividades_conservar)
+            -- El external descarga CSV y luego borra los datos.
+            -- Después de cerrar el overlay, el sistema recarga datos.
+
+    -- NOTA DE DISEÑO: las 3 fases son sub-contextos del ModalReset.
+    -- Esto funciona bien con el modelo de anidamiento de helix.
+    -- La regla de "ámbito cerrado" (un hijo solo transiciona a hermanos
+    -- o al padre) se respeta: cada fase transiciona a otra fase o a ModalReset.

@@ -1,0 +1,53 @@
+-- contexts/ModalHistorial.helix
+-- Overlay: visualización del historial de sesiones.
+-- Tiene dos sub-estados: vista de 7 días y vista de 30 días.
+-- Este es el primer uso natural de contextos anidados.
+
+context ModalHistorial:
+
+    role boton_cerrar: Boton
+        on tap -> cerrar
+
+    -- Los botones de período son los únicos roles activos en el padre.
+    -- La vista en sí se delega a los sub-contextos.
+
+    transitions:
+        on cerrar -> [cerrar_overlay]
+
+    -- Sub-contexto: vista de 7 días (activo por defecto)
+    context Historial7Dias:
+
+        role boton_7dias: Boton
+            on tap -> ignorar              -- ya estamos en 7 días, no hace nada
+
+        role boton_30dias: Boton
+            on tap -> cambiarA30Dias
+
+        transitions:
+            on cambiarA30Dias -> Historial30Dias
+            on cerrar         -> ModalHistorial  -- sube al padre, que cierra el overlay
+
+        effects:
+            -- Al entrar en este sub-contexto, cargar datos de 7 días
+            [al_entrar] -> external cargar_historial(dias: 7)
+
+    -- Sub-contexto: vista de 30 días
+    context Historial30Dias:
+
+        role boton_7dias: Boton
+            on tap -> cambiarA7Dias
+
+        role boton_30dias: Boton
+            on tap -> ignorar              -- ya estamos en 30 días
+
+        transitions:
+            on cambiarA7Dias -> Historial7Dias
+            on cerrar        -> ModalHistorial
+
+        effects:
+            [al_entrar] -> external cargar_historial(dias: 30)
+
+    -- PROPUESTA GAP-7: efectos de ciclo de vida.
+    -- [al_entrar] y [al_salir] son hooks que no existen en el DSL actual.
+    -- Son necesarios para cargar datos al cambiar de sub-contexto.
+    -- Sintaxis propuesta: efectos especiales con notación [lifecycle].

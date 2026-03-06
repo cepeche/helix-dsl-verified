@@ -1,0 +1,45 @@
+-- contexts/ModalCrearTarea.helix
+-- Overlay: creación de nuevo TipoTarea.
+-- Accesible desde ModoNormal y ModoEdicion (botón +).
+--
+-- PROPUESTA GAP-1 (variante): este overlay NO necesita parámetros
+-- de entrada obligatorios, pero PUEDE recibir una actividadPredefinida
+-- (cuando se abre desde el modal de crear actividad).
+-- Esto sugiere parámetros de entrada opcionales.
+--
+-- input (opcional):
+--     actividadPredefinida: Id?
+
+context ModalCrearTarea:
+
+    role campo_nombre: CampoTexto
+        on cambio -> actualizarNuevoNombre(self.valor)
+
+    role campo_busqueda_icono: CampoTexto
+        on cambio -> filtrarIconosCrear(self.valor)
+
+    role selector_icono: SelectorIcono
+        on seleccion -> seleccionarIconoNuevo(self.seleccionado)
+
+    -- PROPUESTA GAP-6: checkboxes de actividades son dinámicos.
+    -- Uno por actividad existente en el sistema.
+    -- role checkbox_actividad[]: Actividad
+    --     on cambio -> toggleActividadPermitida(self.id, self.marcado)
+    role checkbox_actividad: Actividad
+        on cambio -> toggleActividadPermitida(self.id, self.marcado)
+
+    role boton_guardar: Boton
+        on tap -> guardarNuevaTarea
+
+    role boton_cancelar: Boton
+        on tap -> cancelar
+
+    -- PROPUESTA GAP-5: guardarNuevaTarea condicional
+    -- (campo_nombre no vacío Y al menos una actividad seleccionada)
+
+    transitions:
+        on guardarNuevaTarea -> [cerrar_overlay]
+        on cancelar          -> [cerrar_overlay]
+
+    effects:
+        guardarNuevaTarea -> external crear_tipo_tarea(nombre, icono, actividades_seleccionadas)

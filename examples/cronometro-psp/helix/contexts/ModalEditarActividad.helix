@@ -1,0 +1,36 @@
+-- contexts/ModalEditarActividad.helix
+-- Overlay: edición de nombre, color y flag permanente de una Actividad.
+-- Se abre desde ModoEdicion (tap en pestaña de actividad).
+--
+-- PROPUESTA GAP-1: necesita recibir el actividadId para cargar datos actuales.
+
+context ModalEditarActividad:
+
+    -- PROPUESTA GAP-1:
+    -- input:
+    --     actividadId: Id
+
+    role campo_nombre: CampoTexto
+        on cambio -> actualizarNombreActividad(self.valor)
+
+    role selector_color: SelectorColor
+        on seleccion -> seleccionarColor(self.seleccionado)
+
+    role checkbox_permanente: Checkbox
+        on cambio -> marcarPermanente(self.marcado)
+
+    role boton_guardar: Boton
+        on tap -> guardarEdicionActividad
+
+    role boton_cancelar: Boton
+        on tap -> cancelar
+
+    -- PROPUESTA GAP-5: guardarEdicionActividad condicional
+    -- (campo_nombre no vacío)
+
+    transitions:
+        on guardarEdicionActividad -> [cerrar_overlay]
+        on cancelar                -> [cerrar_overlay]
+
+    effects:
+        guardarEdicionActividad -> external actualizar_actividad(actividadId, nombre, color, permanente)

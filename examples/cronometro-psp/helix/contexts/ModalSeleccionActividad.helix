@@ -1,0 +1,42 @@
+-- contexts/ModalSeleccionActividad.helix
+-- Overlay: aparece cuando un TipoTarea tiene más de una actividad
+-- permitida. El usuario elige a qué actividad imputar la sesión.
+--
+-- PROPUESTA GAP-1: necesita recibir el tipoTareaId del contexto padre.
+-- Los botones de actividad se generan dinámicamente a partir de
+-- tipoTarea.actividades_permitidas.
+--
+-- PROPUESTA GAP-6: roles dinámicos.
+-- El número de botones de actividad no es fijo — depende de los datos.
+-- El DSL actual asume roles fijos declarados en el contexto.
+-- ¿Cómo expresar "un rol por cada elemento de una lista"?
+--
+-- Sintaxis propuesta:
+--   role boton_actividad: Actividad para cada actividad in tipoTarea.actividades_permitidas
+--       on tap -> elegirActividad(self.id)
+
+context ModalSeleccionActividad:
+
+    -- PROPUESTA GAP-1:
+    -- input:
+    --     tipoTareaId: Id
+
+    -- PROPUESTA GAP-6: rol dinámico (uno por actividad permitida)
+    -- role boton_actividad[]: Actividad
+    --     on tap -> elegirActividad(self.id)
+    --
+    -- Aproximación con rol genérico (no expresa la multiplicidad):
+    role boton_actividad: Actividad
+        on tap -> elegirActividad(self.id)
+
+    role boton_cancelar: Boton
+        on tap -> cancelar
+
+    transitions:
+        on elegirActividad -> ModalComentario    -- pasa a comentario con actividad elegida
+        on cancelar        -> [cerrar_overlay]
+
+    -- PROPUESTA GAP-1: elegirActividad necesita encadenar parámetros:
+    --   tipoTareaId (viene del input de este contexto)
+    --   actividadId (viene del tap en boton_actividad)
+    -- Ambos deben llegar a ModalComentario.

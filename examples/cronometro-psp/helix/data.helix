@@ -1,0 +1,94 @@
+-- data.helix — Capa de datos del CronometroPSP
+-- Solo estructura. Cero comportamiento.
+-- Fecha: 6 de marzo de 2026
+
+-- Dominio principal
+
+data TipoTarea:
+    tipoId: Id
+    nombre: Texto
+    icono: Texto
+    usos7d: Entero
+    actividades_permitidas: Lista<Id>
+
+data Tarea:
+    tareaId: Id           -- compuesto: "{tipoId}_{actividadId}"
+    tipoId: Id
+    actividadId: Id
+    nombre: Texto
+    icono: Texto
+
+data Actividad:
+    id: Id
+    nombre: Texto
+    color: Color
+    permanente: Booleano
+
+data Sesion:
+    sesionId: Id
+    tareaId: Id
+    inicio: Timestamp
+    notas: Texto?          -- opcional: puede no haber comentario
+
+-- Datos de UI (elementos interactivos como roles)
+
+data CampoTexto:
+    id: Id
+    valor: Texto
+    valido: Booleano
+
+data CampoNumerico:
+    id: Id
+    valor: Entero
+    minimo: Entero
+
+data Boton:
+    id: Id
+    etiqueta: Texto
+    habilitado: Booleano
+
+data Checkbox:
+    id: Id
+    etiqueta: Texto
+    marcado: Booleano
+
+data SelectorColor:
+    id: Id
+    opciones: Lista<Color>
+    seleccionado: Color
+
+data SelectorIcono:
+    id: Id
+    iconos: Lista<Texto>
+    seleccionado: Texto
+    filtro: Texto
+
+data Pestaña:
+    id: Id
+    etiqueta: Texto
+
+data ItemMenu:
+    id: Id
+    etiqueta: Texto
+
+-- Datos del historial
+
+data DiaHistorial:
+    timestamp: Timestamp
+    total: Entero           -- segundos totales
+    por_actividad: Lista<ResumenActividad>
+
+data ResumenActividad:
+    actividadId: Id
+    actividadNombre: Texto
+    actividadColor: Color
+    tiempo: Entero          -- segundos
+
+-- Datos del proceso de reset (3 fases)
+
+data OpcionActividad:
+    id: Id
+    nombre: Texto
+    color: Color
+    permanente: Booleano
+    conservar: Booleano     -- checkbox en fase 2

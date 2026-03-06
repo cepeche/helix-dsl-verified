@@ -1,0 +1,70 @@
+-- external/cronometro_api.helix
+-- Declaración de funciones externas (código convencional que el
+-- compilador helix NO genera, pero cuya firma sí conoce).
+-- El compilador genera un trait Rust que el backend debe implementar.
+
+external module cronometro_api:
+
+    -- Sesiones
+    iniciar_sesion(
+        tarea_id: Id,
+        notas: Texto?,
+        minutos_retroactivos: Entero,
+        sustituir: Booleano
+    ) -> Sesion
+
+    obtener_sesion_activa() -> Sesion?
+
+    finalizar_sesion(sesion_id: Id) -> Sesion
+
+    -- Tipos de tarea
+    crear_tipo_tarea(
+        nombre: Texto,
+        icono: Texto,
+        actividades_permitidas: Lista<Id>
+    ) -> TipoTarea
+
+    editar_tipo_tarea(
+        tipo_id: Id,
+        nombre: Texto,
+        icono: Texto
+    ) -> TipoTarea
+
+    -- Actividades
+    crear_actividad(
+        nombre: Texto,
+        color: Color,
+        permanente: Booleano
+    ) -> Actividad
+
+    actualizar_actividad(
+        id: Id,
+        nombre: Texto,
+        color: Color,
+        permanente: Booleano
+    ) -> Actividad
+
+    -- Historial
+    cargar_historial(dias: Entero) -> Lista<DiaHistorial>
+
+    -- Diagnóstico
+    verificar_conexion() -> EstadoConexion
+    cargar_tiempo_acumulado() -> Lista<ResumenActividad>
+
+    -- Reset
+    reset_datos(actividades_conservar: Lista<Id>) -> Resultado
+    descargar_csv() -> Resultado
+
+    -- Utilidades UI
+    calcular_tiempo_transcurrido(inicio: Timestamp) -> Entero
+    actualizar_grid_visible() -> Resultado
+
+    -- NOTA: estas firmas son el contrato entre helix y el código convencional.
+    -- El código convencional (PHP/JS en este caso) implementa el trait.
+    -- Los tests generados por helix usan mocks de este trait.
+    --
+    -- PROPUESTA GAP-8: tipos de retorno de error.
+    -- Las funciones externas pueden fallar (red, servidor caído, etc.).
+    -- El DSL actual no tiene sintaxis para declarar tipos de error
+    -- ni para modelar el flujo de error (mostrarError, reintentar, etc.).
+    -- Esto queda implícito en los externals.

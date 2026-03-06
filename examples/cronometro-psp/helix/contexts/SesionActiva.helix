@@ -1,0 +1,35 @@
+-- contexts/SesionActiva.helix
+-- Contexto CONCURRENTE: coexiste con ModoNormal o ModoEdicion.
+-- Se activa cuando hay una sesión en curso; se desactiva cuando termina.
+--
+-- En DCI: SesionActiva es un Context que asigna comportamiento
+-- adicional a los roles cuando hay sesión activa. No reemplaza
+-- al contexto base — lo enriquece.
+
+context SesionActiva:
+
+    -- El timer en el header: muestra tiempo transcurrido
+    role display_timer: Boton          -- rol de solo lectura (Boton es aproximación)
+        on tap -> ignorar              -- el timer no responde a tap
+
+    -- PROPUESTA GAP-4: roles condicionales en overlays.
+    -- Cuando ModalComentario está abierto Y SesionActiva está activo,
+    -- aparece un checkbox extra ("Sustituye a la tarea en curso").
+    -- El DSL actual no tiene sintaxis para "role X que solo existe
+    -- dentro del overlay Y cuando este contexto está activo".
+    --
+    -- Sintaxis propuesta:
+    --   role checkbox_sustituir: Checkbox en ModalComentario
+    --       on cambio -> marcarSustituir(self.marcado)
+    --
+    -- Por ahora lo declaramos aquí como aproximación:
+    role checkbox_sustituir: Checkbox
+        on cambio -> marcarSustituir(self.marcado)
+
+    transitions:
+        on sesionFinalizada -> [desactivar]    -- PROPUESTA GAP-3: sintaxis para
+                                               -- desactivar un contexto concurrente
+
+    effects:
+        -- El timer se actualiza cada 60s vía efecto externo
+        actualizarTimer -> external calcular_tiempo_transcurrido(sesion_activa.inicio)

@@ -1,0 +1,38 @@
+-- contexts/MenuConfiguracion.helix
+-- Overlay: menú desplegable del botón ⚙️.
+-- Se cierra al hacer tap fuera de él.
+-- Accesible desde ModoNormal y ModoEdicion.
+--
+-- NOTA: este es un caso límite. El menú es un overlay muy ligero
+-- (un popover, no una capa completa). La distinción entre
+-- "overlay de popover" y "overlay de modal" no existe en el DSL actual.
+-- Ambos se comportan igual: se apilan sobre el contexto base.
+
+context MenuConfiguracion:
+
+    role item_nueva_actividad: ItemMenu
+        on tap -> abrirCrearActividad
+
+    role item_historial: ItemMenu
+        on tap -> abrirHistorial
+
+    role item_acerca_de: ItemMenu
+        on tap -> abrirAcercaDe
+
+    role item_reset: ItemMenu
+        on tap -> abrirReset
+
+    role overlay: Boton                  -- tap fuera del menú lo cierra
+        on tap -> cerrar
+
+    transitions:
+        on abrirCrearActividad -> ModalCrearActividad
+        on abrirHistorial      -> ModalHistorial
+        on abrirAcercaDe       -> ModalAcercaDe
+        on abrirReset          -> ModalReset
+        on cerrar              -> [cerrar_overlay]
+
+    -- PROPUESTA GAP-2 (detalle): cuando un ítem del menú abre otro overlay,
+    -- ¿el menú se cierra primero o el nuevo overlay se apila sobre él?
+    -- En app.js: el menú se cierra y el modal se abre (no se apilan).
+    -- El modelo de pila necesita soporte para "cerrar y abrir" en una transición.

@@ -1,0 +1,42 @@
+-- contexts/ModalEditarTarea.helix
+-- Overlay: edición de nombre e icono de un TipoTarea existente.
+-- Se abre desde ModoEdicion (tap en tarjeta).
+--
+-- PROPUESTA GAP-1: necesita recibir el tipoTareaId para
+-- cargar los datos actuales del tipo de tarea.
+
+context ModalEditarTarea:
+
+    -- PROPUESTA GAP-1:
+    -- input:
+    --     tipoTareaId: Id
+
+    role campo_nombre: CampoTexto
+        on cambio -> actualizarNombre(self.valor)
+
+    role campo_busqueda_icono: CampoTexto
+        on cambio -> filtrarIconos(self.valor)
+
+    role selector_icono: SelectorIcono
+        on seleccion -> seleccionarIcono(self.seleccionado)
+
+    role boton_guardar: Boton
+        on tap -> guardarEdicion
+
+    role boton_cancelar: Boton
+        on tap -> cancelar
+
+    -- PROPUESTA GAP-5: transición condicional.
+    -- guardarEdicion solo debe proceder si campo_nombre.valor no está vacío.
+    -- Sintaxis propuesta:
+    --   on guardarEdicion si campo_nombre.valido -> [cerrar_overlay]
+    --   on guardarEdicion si not campo_nombre.valido -> mostrarErrorNombre
+
+    transitions:
+        on guardarEdicion -> [cerrar_overlay]    -- vuelve a ModoEdicion
+        on cancelar       -> [cerrar_overlay]
+
+    effects:
+        guardarEdicion -> external editar_tipo_tarea(tipoTareaId, nombre, icono)
+        -- Después de guardar, el sistema recarga datos (cargarDatosIniciales en app.js)
+        -- El efecto debe incluir la recarga de la UI.
